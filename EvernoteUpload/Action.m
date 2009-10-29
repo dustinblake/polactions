@@ -12,11 +12,7 @@
 
 #import "../../EvernoteConsumerID.h"
 
-#ifdef __DEBUG__
-#define kServer @"sandbox.evernote.com"
-#else
 #define kServer @"www.evernote.com"
-#endif
 
 #define LOCALIZED_STRING(__STRING__) [[NSBundle bundleForClass:[self class]] localizedStringForKey:(__STRING__) value:(__STRING__) table:nil]
 
