@@ -72,6 +72,7 @@
 	NSString*					model;
 	EDAMTimestamp				timestamp;
 	
+	//Retrieve username and password from parameters or directly from Evernote's application settings if absent
 	if([username length]) {
 		if(![password length]) {
 			*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Evernote account password is required") forKey:OSAScriptErrorMessage];
@@ -92,6 +93,7 @@
 		}
 	}
 	
+	//Check API version compatibility with Evernote servers and authenticate
 	transport = [[THTTPClient alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/edam/user", kServer]]];
 	protocol = [[TBinaryProtocol alloc] initWithTransport:transport];
 	[transport release];
@@ -112,6 +114,7 @@
 	NSLog(@"\n%@", [authentication user]);
 #endif
 	
+	//Retrieve target notebook
 	transport = [[THTTPClient alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/edam/note/%@", [[authentication user] privilege] > PrivilegeLevel_NORMAL ? @"https" : @"http", kServer, [[authentication user] shardId]]]];
 	protocol = [[TBinaryProtocol alloc] initWithTransport:transport];
 	[transport release];
@@ -138,6 +141,7 @@
 	NSLog(@"\n%@", notebook);
 #endif
 	
+	//Process each input file and add it as a new note to the target notebook
 	if(![input isKindOfClass:[NSArray class]])
 	input = [NSArray arrayWithObject:input];
 	for(path in input) {
