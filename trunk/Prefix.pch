@@ -2,3 +2,5 @@
 	#import <Cocoa/Cocoa.h>
 	#import <Automator/Automator.h>
 #endif
+
+#include <Carbon/Carbon.h>
