@@ -71,6 +71,7 @@
 	NSString*					make;
 	NSString*					model;
 	EDAMTimestamp				timestamp;
+	NSString*					string;
 	
 	//Retrieve username and password from parameters or directly from Evernote's application settings if absent
 	if([username length]) {
@@ -179,13 +180,14 @@
 							model = nil;
 							else
 							model = [[model retain] autorelease];
-							timestamp = [[_dateFormatter dateFromString:[[(NSDictionary*)imageProperties objectForKey:(id)kCGImagePropertyExifDictionary] objectForKey:(id)kCGImagePropertyExifDateTimeOriginal]] timeIntervalSince1970] * 1000.0;
+							if((string = [[(NSDictionary*)imageProperties objectForKey:(id)kCGImagePropertyExifDictionary] objectForKey:(id)kCGImagePropertyExifDateTimeOriginal]))
+							timestamp = [[_dateFormatter dateFromString:string] timeIntervalSince1970] * 1000.0;
 							CFRelease(imageProperties);
 						}
 						CFRelease(imageSource);
 					}
 				}
-				else
+				if(timestamp == 0)
 				timestamp = [[[manager attributesOfItemAtPath:path error:NULL] objectForKey:NSFileCreationDate] timeIntervalSince1970] * 1000.0;
 #ifdef __DEBUG__
 				NSLog(@"\n%@ [%@ | %i | %@ | %@ | %ix%i | %@ | %@]", path, mimeType, [rawData length], hash, [NSDate dateWithTimeIntervalSince1970:((NSTimeInterval)timestamp / 1000.0)], width, height, make, model);
