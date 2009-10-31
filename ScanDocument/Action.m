@@ -133,7 +133,8 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 	ICAObject							scanner = 0;
 	ICAScannerSessionID					sessionID = 0;
 	double								maxSizeW = 0.0,
-										maxSizeH = 0.0;	
+										maxSizeH = 0.0;
+	NSString*							path = nil;
 	ICAGetDeviceListPB					pb1 = {};
     ICACopyObjectPropertyDictionaryPB	pb2 = {};
 	ICAScannerOpenSessionPB				pb3 = {};
@@ -146,7 +147,6 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 	NSDictionary*						device;
 	NSMutableDictionary*				scanArea;
 	NSMutableDictionary*				parameters;
-	NSString*							path = nil;
 	
 	//Retrive first connected scanner
 	if(ICAGetDeviceList(&pb1, NULL) == noErr) {
@@ -246,28 +246,36 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 							[output addObject:input];
 							[output addObject:path];
 						}
-						else
-						path = nil;
+						else {
+							*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to retrieve resulting image file") forKey:OSAScriptErrorMessage];
+							path = nil;
+						}
 					}
+					else
+					*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to start scanning") forKey:OSAScriptErrorMessage];
 				}
-				else
-				path = nil;
+				else {
+					*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to set scanner parameters") forKey:OSAScriptErrorMessage];
+					path = nil;
+				}
 				[parameters release];
 				[scanArea release];
 			}
+			else
+			*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to get scanner parameters") forKey:OSAScriptErrorMessage];
 			
 			CFRelease(pb5.theDict);
 			pb4.sessionID = sessionID;
 			ICAScannerCloseSession(&pb4, NULL);
 		}
+		else
+		*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to connect to scanner") forKey:OSAScriptErrorMessage];
 		
-		if(path == nil) {
-			*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Scanning operation failed") forKey:OSAScriptErrorMessage];
-			return nil;
-		}
+		if(path == nil)
+		return nil;
 	}
 	else {
-		*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to find any connected scanner device") forKey:OSAScriptErrorMessage];
+		*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to find any connected scanner") forKey:OSAScriptErrorMessage];
 		return nil;
 	}
 	
