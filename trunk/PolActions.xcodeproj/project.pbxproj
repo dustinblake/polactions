@@ -640,6 +640,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2C33898109906FE00BE3C1A /* Debug.xcconfig */;
 			buildSettings = {
+				"ARCHS[sdk=macosx10.5*]" = "$(ARCHS_STANDARD_32_64_BIT)";
+				"ARCHS[sdk=macosx10.6*]" = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "${SDKROOT}/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks";
 				GCC_ENABLE_OBJC_GC = supported;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/thrift-cocoa/src/**";
@@ -651,6 +653,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2C33899109906FE00BE3C1A /* Release.xcconfig */;
 			buildSettings = {
+				"ARCHS[sdk=macosx10.5*]" = "$(ARCHS_STANDARD_32_64_BIT)";
+				"ARCHS[sdk=macosx10.6*]" = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "${SDKROOT}/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks";
 				GCC_ENABLE_OBJC_GC = supported;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/thrift-cocoa/src/**";
