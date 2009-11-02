@@ -88,6 +88,8 @@
 		65181750067A8D39005BD953 /* Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Action.m; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* Create Evernote Note With File.action */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Create Evernote Note With File.action"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E209ABC6109E63C700AE58EC /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		E209ABC7109E63C700AE58EC /* googlecode_upload.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = googlecode_upload.py; sourceTree = "<group>"; };
 		E2939685109910A100BA5DB6 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		E293968A109910A900BA5DB6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E2939EAF109C066500BA5DB6 /* Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				32DBCF630370AF2F00C91783 /* Prefix.pch */,
+				E209ABC5109E63C700AE58EC /* Support */,
 				08FB77AFFE84173DC02AAC07 /* EvernoteUpload */,
 				E2939EAE109C066500BA5DB6 /* ScanDocument */,
 				E2C337DD109906E300BE3C1A /* evernote-api-1.13 */,
@@ -234,6 +237,15 @@
 				E2939EEC109C084500BA5DB6 /* Scan Document.action */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		E209ABC5109E63C700AE58EC /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				E209ABC6109E63C700AE58EC /* build.sh */,
+				E209ABC7109E63C700AE58EC /* googlecode_upload.py */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		E2939EAE109C066500BA5DB6 /* ScanDocument */ = {
