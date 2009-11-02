@@ -194,6 +194,9 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 			pb5.theDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 			if(ICAScannerGetParameters(&pb5, NULL) == noErr) {
 				device = [(NSDictionary*)pb5.theDict objectForKey:@"device"];
+#ifdef __DEBUG__
+				NSLog(@"\n%@", device);
+#endif
 				maxSizeW = _ICAP_GetPhysicalWidth(device);
 				maxSizeH = _ICAP_GetPhysicalHeight(device);
 			}
