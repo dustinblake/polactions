@@ -164,6 +164,7 @@
 	if(![input isKindOfClass:[NSArray class]])
 	input = [NSArray arrayWithObject:input];
 	for(path in input) {
+		result = nil;
 		if([manager fileExistsAtPath:path isDirectory:&isDirectory] && !isDirectory) {
 			mimeType = [standardMimeTypes objectForKey:[[path pathExtension] lowercaseString]];
 			if(mimeType == nil)
@@ -224,7 +225,6 @@
 				}
 				@catch(NSException* exception) {
 					NSLog(@"<EXCEPTION>\n%@", exception);
-					result = nil;
 				}
 				
 				[note release];
@@ -233,8 +233,6 @@
 				[data release];
 				[rawData release];
 			}
-			else
-			result = nil;
 		}
 		if(result == nil) {
 			if(*errorInfo == nil)
