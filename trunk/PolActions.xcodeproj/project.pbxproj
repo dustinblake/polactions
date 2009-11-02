@@ -661,7 +661,7 @@
 		E2939EEA109C084500BA5DB6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = /Users/pol/Source/PolActions/ScanDocument/Info.plist;
+				INFOPLIST_FILE = ScanDocument/Info.plist;
 				INSTALL_PATH = /;
 				PRODUCT_NAME = "Scan Document";
 				SKIP_INSTALL = NO;
@@ -672,7 +672,7 @@
 		E2939EEB109C084500BA5DB6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = /Users/pol/Source/PolActions/ScanDocument/Info.plist;
+				INFOPLIST_FILE = ScanDocument/Info.plist;
 				INSTALL_PATH = /;
 				PRODUCT_NAME = "Scan Document";
 				SKIP_INSTALL = NO;
