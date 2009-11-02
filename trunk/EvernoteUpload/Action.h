@@ -24,5 +24,4 @@
 	NSString*			_identifier;
 	NSDateFormatter*	_dateFormatter;
 }
-- (id)runWithInput:(id)input fromAction:(AMAction*)anAction error:(NSDictionary**)errorInfo;
 @end
