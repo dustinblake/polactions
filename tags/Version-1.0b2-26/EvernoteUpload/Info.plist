@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMAccepts</key>
+	<dict>
+		<key>Container</key>
+		<string>List</string>
+		<key>Optional</key>
+		<false/>
+		<key>Types</key>
+		<array>
+			<string>com.apple.cocoa.path</string>
+		</array>
+	</dict>
+	<key>AMApplication</key>
+	<string>Evernote</string>
+	<key>AMCanShowSelectedItemsWhenRun</key>
+	<true/>
+	<key>AMCanShowWhenRun</key>
+	<true/>
+	<key>AMCategory</key>
+	<string>AMCategoryUtilities</string>
+	<key>AMDefaultParameters</key>
+	<dict/>
+	<key>AMDescription</key>
+	<dict>
+		<key>AMDNote</key>
+		<string>Some file types may require a Premium Evernote account.</string>
+		<key>AMDRequires</key>
+		<string>An Evernote account.</string>
+		<key>AMDSummary</key>
+		<string>Creates a new Evernote note for each input file.</string>
+		<key>AMDWebsite</key>
+		<string>http://www.pol-online.net</string>
+	</dict>
+	<key>AMIconName</key>
+	<string>Evernote</string>
+	<key>AMKeywords</key>
+	<array>
+		<string>Evernote</string>
+		<string>Note</string>
+	</array>
+	<key>AMName</key>
+	<string>${EXECUTABLE_NAME}</string>
+	<key>AMProvides</key>
+	<dict>
+		<key>Container</key>
+		<string>List</string>
+		<key>Types</key>
+		<array>
+			<string>com.apple.cocoa.path</string>
+		</array>
+	</dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string>net.pol-online.${PRODUCT_NAME:identifier}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>${PRODUCT_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>__VERSION__</string>
+	<key>CFBundleVersion</key>
+	<string>__SVN_REVISION__</string>
+	<key>CFBundleGetInfoString</key>
+	<string>__NAME__ version __VERSION__ (__SVN_REVISION__), Copyright 2009, Pierre-Olivier Latour</string>
+	<key>NSPrincipalClass</key>
+	<string>EvernoteUpload</string>
+	<key>EvernoteStandardTypes</key>
+	<dict>
+		<key>gif</key>
+		<string>image/gif</string>
+		<key>jpg</key>
+		<string>image/jpeg</string>
+		<key>jpeg</key>
+		<string>image/jpeg</string>
+		<key>png</key>
+		<string>image/png</string>
+		<key>wav</key>
+		<string>audio/wav</string>
+		<key>mp3</key>
+		<string>audio/mpeg</string>
+		<key>pdf</key>
+		<string>application/pdf</string>
+	</dict>
+	<key>EvernoteDefaultType</key>
+	<string>application/octet-stream</string>
+</dict>
+</plist>
