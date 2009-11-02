@@ -125,6 +125,16 @@ static id _ICAP_GetOneValue(NSDictionary* info, NSString* key)
 	return nil;
 }
 
+static double _ICAP_GetNativeResolutionX(NSDictionary* info)
+{
+	return [_ICAP_GetOneValue(info, @"ICAP_XNATIVERESOLUTION") doubleValue];
+}
+
+static double _ICAP_GetNativeResolutionY(NSDictionary* info)
+{
+	return [_ICAP_GetOneValue(info, @"ICAP_YNATIVERESOLUTION") doubleValue];
+}
+
 static double _ICAP_GetPhysicalWidth(NSDictionary* info)
 {
 	return [_ICAP_GetOneValue(info, @"ICAP_PHYSICALWIDTH") doubleValue];
@@ -150,7 +160,9 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 										height = [[[self parameters] objectForKey:@"height"] doubleValue];
 	ICAObject							scanner = 0;
 	ICAScannerSessionID					sessionID = 0;
-	double								maxSizeW = 0.0,
+	double								resolutionX = 0.0,
+										resolutionY = 0.0,
+										maxSizeW = 0.0,
 										maxSizeH = 0.0;
 	NSString*							path = nil;
 	ICAGetDeviceListPB					pb1 = {};
@@ -161,6 +173,7 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 	ICAScannerSetParametersPB			pb6 = {};
 	ICAScannerStartPB					pb7 = {};
 	ICAScannerStatusPB					pb8 = {};
+	ICAScannerInitializePB				pb9 = {};
 	CFDictionaryRef						properties;
 	NSDictionary*						device;
 	NSMutableDictionary*				scanArea;
@@ -190,18 +203,23 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
         if(ICAScannerOpenSession(&pb3, NULL) == noErr) {
 			sessionID = pb3.sessionID;
 			
-			pb5.sessionID = sessionID;
-			pb5.theDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-			if(ICAScannerGetParameters(&pb5, NULL) == noErr) {
-				device = [(NSDictionary*)pb5.theDict objectForKey:@"device"];
+			pb9.sessionID = sessionID;
+			if(ICAScannerInitialize(&pb9, NULL) == noErr) {
+				pb5.sessionID = sessionID;
+				pb5.theDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFCopyStringDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+				if(ICAScannerGetParameters(&pb5, NULL) == noErr) {
+					device = [(NSDictionary*)pb5.theDict objectForKey:@"device"];
 #ifdef __DEBUG__
-				NSLog(@"\n%@", device);
+					NSLog(@"\n%@", device);
 #endif
-				maxSizeW = _ICAP_GetPhysicalWidth(device);
-				maxSizeH = _ICAP_GetPhysicalHeight(device);
+					resolutionX = _ICAP_GetNativeResolutionX(device);
+					resolutionY = _ICAP_GetNativeResolutionY(device);
+					maxSizeW = _ICAP_GetPhysicalWidth(device);
+					maxSizeH = _ICAP_GetPhysicalHeight(device);
+				}
 			}
 			
-			if((maxSizeW > 0.0) && (maxSizeH > 0.0)) {
+			if((resolutionX > 0.0) && (resolutionY > 0.0) && (maxSizeW > 0.0) && (maxSizeH > 0.0)) {
 				path = [NSTemporaryDirectory() stringByAppendingPathComponent:[[[NSDate date] descriptionWithCalendarFormat:@"%Y-%m-%d-%H%M%S" timeZone:nil locale:nil] stringByAppendingPathExtension:_Extensions[format]]];
 				if(units == kUnits_Centimeters) {
 					originX /= kInchesToCentimeters;
@@ -209,6 +227,10 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 					width /= kInchesToCentimeters;
 					height /= kInchesToCentimeters;
 				}
+				originX = floor(originX * resolutionX);
+				originY = floor(originY * resolutionY);
+				width = ceil(width * resolutionX + 0.5);
+				height = ceil(height * resolutionY + 0.5);
 				originX = MIN(MAX(originX, 0.0), maxSizeW);
 				originY = MIN(MAX(originY, 0.0), maxSizeH);
 				width = MIN(MAX(width > 0.0 ? width : maxSizeW, 0.0), maxSizeW - originX);
@@ -285,6 +307,7 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 			else
 			*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to get scanner parameters") forKey:OSAScriptErrorMessage];
 			
+			if(pb5.theDict)
 			CFRelease(pb5.theDict);
 			pb4.sessionID = sessionID;
 			ICAScannerCloseSession(&pb4, NULL);
