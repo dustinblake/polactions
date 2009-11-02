@@ -7,9 +7,10 @@
 #####
 
 # Setup variables
-DATE=`date "+%Y-%m-%d-%H-%M-%S"`
+DATE=`date "+%Y-%m-%d-%H%M%S"`
 SCRATCH_DIR="/tmp/$DATE"
 PROJECT="PolActions"
+NAME=`echo "$PROJECT" | tr '[A-Z]' '[a-z]'`
 XCODEBUILD="$1/usr/bin/xcodebuild"
 
 # Create scratch directory
@@ -18,7 +19,7 @@ cd "$SCRATCH_DIR"
 
 # Check out TOT & retrieve version / revision
 echo "Checking out HEAD..."
-svn checkout "https://$PROJECT.googlecode.com/svn/trunk/" "$PROJECT" > /dev/null
+svn checkout "https://$NAME.googlecode.com/svn/trunk/" "$PROJECT" > /dev/null
 if [[ $? -ne 0 ]]
 then
 	rm -rf "$SCRATCH_DIR"
@@ -30,7 +31,7 @@ echo "<Using version $VERSION ($REVISION)>"
 
 # Tag revision on server side
 echo "Tagging revision on server..."
-svn copy -r $REVISION -m "Tagging version $VERSION for revision $REVISION" "https://$PROJECT.googlecode.com/svn/trunk/" "https://$PROJECT.googlecode.com/svn/tags/Version-$VERSION-$REVISION" > /dev/null
+svn copy -r $REVISION -m "Tagging version $VERSION for revision $REVISION" "https://$NAME.googlecode.com/svn/trunk/" "https://$NAME.googlecode.com/svn/tags/Version-$VERSION-$REVISION" > /dev/null
 if [[ $? -ne 0 ]]
 then
 	rm -rf "$SCRATCH_DIR"
@@ -40,7 +41,7 @@ fi
 # Fix svn:externals revisions for PolKit & Thrift on the tagged revision
 echo "Fixing external revisions on tagged revision..."
 TAG="$PROJECT Tag $VERSION ($REVISION)"
-svn checkout "https://$PROJECT.googlecode.com/svn/tags/Version-$VERSION-$REVISION" "$TAG" > /dev/null
+svn checkout "https://$NAME.googlecode.com/svn/tags/Version-$VERSION-$REVISION" "$TAG" > /dev/null
 if [[ $? -ne 0 ]]
 then
 	rm -rf "$SCRATCH_DIR"
@@ -77,7 +78,7 @@ fi
 # Create & upload build archive
 ARCHIVE="$PROJECT-$VERSION.zip"
 ditto -c -k --keepParent "$ROOT" "$ARCHIVE"
-$PROJECT/Support/googlecode_upload.py -s "$PROJECT $VERSION (PRE-RELEASE - DOWNLOAD AT YOUR OWN RISK - DO NOT REDISTRIBUTE)" -l "Type-Archive, OpSys-OSX" -p "$PROJECT" -u "info@pol-online.net" "$ARCHIVE"
+$PROJECT/Support/googlecode_upload.py -s "$PROJECT $VERSION (PRE-RELEASE - DOWNLOAD AT YOUR OWN RISK - DO NOT REDISTRIBUTE)" -l "Type-Archive, OpSys-OSX" -p "$NAME" -u "info@pol-online.net" "$ARCHIVE"
 if [[ $? -ne 0 ]]
 then
         mv -f "$ARCHIVE" ~/Desktop/
