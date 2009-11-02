@@ -618,8 +618,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = EvernoteUpload/Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Automator";
+				INSTALL_PATH = /;
 				PRODUCT_NAME = "Create Evernote Note With File";
+				SKIP_INSTALL = NO;
 				WRAPPER_EXTENSION = action;
 			};
 			name = Debug;
@@ -628,8 +629,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = EvernoteUpload/Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Automator";
+				INSTALL_PATH = /;
 				PRODUCT_NAME = "Create Evernote Note With File";
+				SKIP_INSTALL = NO;
 				WRAPPER_EXTENSION = action;
 			};
 			name = Release;
@@ -660,8 +662,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = /Users/pol/Source/PolActions/ScanDocument/Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Automator";
+				INSTALL_PATH = /;
 				PRODUCT_NAME = "Scan Document";
+				SKIP_INSTALL = NO;
 				WRAPPER_EXTENSION = action;
 			};
 			name = Debug;
@@ -670,8 +673,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = /Users/pol/Source/PolActions/ScanDocument/Info.plist;
-				INSTALL_PATH = "$(HOME)/Library/Automator";
+				INSTALL_PATH = /;
 				PRODUCT_NAME = "Scan Document";
+				SKIP_INSTALL = NO;
 				WRAPPER_EXTENSION = action;
 			};
 			name = Release;

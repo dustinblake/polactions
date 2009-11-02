@@ -12,10 +12,21 @@ SCRATCH_DIR="/tmp/$DATE"
 PROJECT="PolActions"
 NAME=`echo "$PROJECT" | tr '[A-Z]' '[a-z]'`
 XCODEBUILD="$1/usr/bin/xcodebuild"
+TEMP_1=`pwd`
+TEMP_2=`dirname "$0"`
+CONSUMER="$TEMP_1/$TEMP_2/../../EvernoteConsumerID.h"
 
 # Create scratch directory
 mkdir "$SCRATCH_DIR"
 cd "$SCRATCH_DIR"
+
+# Copy EvernoteConsumerID.h file
+cp "$CONSUMER" "$SCRATCH_DIR"
+if [[ $? -ne 0 ]]
+then
+	rm -rf "$SCRATCH_DIR"
+	exit 1;
+fi
 
 # Check out TOT & retrieve version / revision
 echo "Checking out HEAD..."
