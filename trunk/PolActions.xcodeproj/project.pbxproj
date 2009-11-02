@@ -66,14 +66,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 089C1669FE841209C02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D5B49AC048680CD000E48DA /* EvernoteUpload */;
+			remoteGlobalIDString = 8D5B49AC048680CD000E48DA;
 			remoteInfo = EvernoteUpload;
 		};
 		E2939EF3109C085F00BA5DB6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 089C1669FE841209C02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = E2939EC5109C084500BA5DB6 /* ScanDocument */;
+			remoteGlobalIDString = E2939EC5109C084500BA5DB6;
 			remoteInfo = ScanDocument;
 		};
 /* End PBXContainerItemProxy section */
