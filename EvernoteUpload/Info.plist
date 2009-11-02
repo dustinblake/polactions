@@ -30,7 +30,7 @@
 		<key>AMDRequires</key>
 		<string>An Evernote account.</string>
 		<key>AMDSummary</key>
-		<string>Creates a new Evenote note for each input file.</string>
+		<string>Creates a new Evernote note for each input file.</string>
 		<key>AMDWebsite</key>
 		<string>http://www.pol-online.net</string>
 	</dict>
