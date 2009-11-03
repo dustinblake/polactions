@@ -1,5 +1,5 @@
 /*
-	This file is part of the PolActions set of Automator actions.
+	This file is part of the PolActions collection of Automator actions.
 	Copyright (C) 2008-2009 Pierre-Olivier Latour <info@pol-online.net>
 	
 	This program is free software: you can redistribute it and/or modify
@@ -47,8 +47,16 @@ typedef enum {
 } Units;
 
 static NSString* _Modes[] = {@"CMYK", @"Gray", @"RGB"};
-static NSString* _Extensions[] = {@"jpg", @"png", @"tiff"};
+static NSString* _Extensions[] = {@"jpeg", @"png", @"tiff"};
 static const CFStringRef* _Types[] = {&kUTTypeJPEG, &kUTTypePNG, &kUTTypeTIFF};
+
+#ifdef IMAGE_CAPTURE_CORE_AVAILABLE
+@interface ScanDocument () <ICDeviceBrowserDelegate, ICScannerDeviceDelegate>
+#else
+@interface ScanDocument ()
+#endif
+- (void) _didFinish;
+@end
 
 static void _ICAP_SetOneValue(NSMutableDictionary* info, NSString* key, id value)
 {
@@ -151,11 +159,176 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 	return [_ICAP_GetOneValue(info, @"ICAP_PHYSICALHEIGHT") doubleValue];
 }
 
+#ifdef IMAGE_CAPTURE_CORE_AVAILABLE
+
+static NSDictionary* _DictionaryFromError(NSError* error)
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:[error code]], OSAScriptErrorNumber, [error localizedDescription], OSAScriptErrorMessage, nil];
+}
+
+#endif
+
 @implementation ScanDocument
 
-- (id) runWithInput:(id)input fromAction:(AMAction*)anAction error:(NSDictionary**)errorInfo
+#ifdef IMAGE_CAPTURE_CORE_AVAILABLE
+
+- (void) didRemoveDevice:(ICDevice*)device
 {
-	NSMutableArray*						output = [NSMutableArray array];
+	;
+}
+
+- (void) device:(ICDevice*)device didCloseSessionWithError:(NSError*)error
+{
+	[self _didFinish]; //FIXME: Any error is ignored
+}
+
+- (void) scannerDevice:(ICScannerDevice*)scanner didCompleteScanWithError:(NSError*)error
+{
+	//Make sure scan was successful
+	if(error == nil) {
+		if(![[NSFileManager defaultManager] fileExistsAtPath:_result]) {
+			[_result release];
+			_result = [[NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to retrieve resulting image file") forKey:OSAScriptErrorMessage] retain];
+		}
+	}
+	else {
+		[_result release];
+		_result = [_DictionaryFromError(error) retain];
+	}
+	
+	//Close session
+	[_scanner requestCloseSession];
+}
+
+- (void) device:(ICDevice*)device didOpenSessionWithError:(NSError*)error
+{
+	//Make sure the session was open successfully
+	if(error) {
+		_result = [_DictionaryFromError(error) retain];
+		[self _didFinish];
+		return;
+	}
+}
+
+- (void) deviceDidBecomeReady:(ICDevice*)device
+{
+	ICScannerFunctionalUnit*			functionalUnit = [_scanner selectedFunctionalUnit];
+	double								resolution = [[[self parameters] objectForKey:@"dpi"] doubleValue];
+	Format								format = [[[self parameters] objectForKey:@"format"] intValue];
+	Mode								mode = [[[self parameters] objectForKey:@"mode"] intValue];
+	Units								units = [[[self parameters] objectForKey:@"units"] intValue];
+	double								originX = [[[self parameters] objectForKey:@"originX"] doubleValue],
+										originY = [[[self parameters] objectForKey:@"originY"] doubleValue],
+										width = [[[self parameters] objectForKey:@"width"] doubleValue],
+										height = [[[self parameters] objectForKey:@"height"] doubleValue];
+	NSSize								maxSize;
+	NSString*							path;
+	
+#ifdef __DEBUG__
+	NSLog(@"\n%@\n%@", _scanner, functionalUnit);
+#endif
+	
+	//Make sure all dimensions are in inches
+	functionalUnit.measurementUnit = ICScannerMeasurementUnitInches;
+	
+	//Set scan parameters
+	maxSize = functionalUnit.physicalSize;
+	if(units == kUnits_Centimeters) {
+		originX /= kInchesToCentimeters;
+		originY /= kInchesToCentimeters;
+		width /= kInchesToCentimeters;
+		height /= kInchesToCentimeters;
+	}
+	originX = MIN(MAX(originX, 0.0), maxSize.width);
+	originY = MIN(MAX(originY, 0.0), maxSize.height);
+	width = MIN(MAX(width > 0.0 ? width : maxSize.width, 0.0), maxSize.width - originX);
+	height = MIN(MAX(height > 0.0 ? height : maxSize.height, 0.0), maxSize.height - originY);
+	functionalUnit.scanArea = NSMakeRect(originX, originY, width, height);
+	functionalUnit.resolution = [functionalUnit.supportedResolutions indexGreaterThanOrEqualToIndex:resolution]; //FIXME: We don't scan at the exact requested resolution
+	if(functionalUnit.resolution == NSNotFound)
+	functionalUnit.resolution = [functionalUnit.supportedResolutions firstIndex];
+	switch(mode) {
+		
+		case kMode_BW:
+		functionalUnit.pixelDataType = ICScannerPixelDataTypeBW;
+		functionalUnit.bitDepth = ICScannerBitDepth1Bit;
+		break;
+		
+		case kMode_Gray:
+		functionalUnit.pixelDataType = ICScannerPixelDataTypeGray;
+		functionalUnit.bitDepth = ICScannerBitDepth8Bits;
+		break;
+		
+		case kMode_RGB:
+		functionalUnit.pixelDataType = ICScannerPixelDataTypeRGB;
+		functionalUnit.bitDepth = ICScannerBitDepth8Bits;
+		break;
+		
+	}
+	path = [NSTemporaryDirectory() stringByAppendingPathComponent:[[[NSDate date] descriptionWithCalendarFormat:@"%Y-%m-%d-%H%M%S" timeZone:nil locale:nil] stringByAppendingPathExtension:_Extensions[format]]];
+	_scanner.transferMode = ICScannerTransferModeFileBased;
+	_scanner.downloadsDirectory = [NSURL fileURLWithPath:[path stringByDeletingLastPathComponent]];
+	_scanner.documentName = [[path lastPathComponent] stringByDeletingPathExtension];
+	_scanner.documentUTI = (id)*_Types[format];
+	
+	//Perform scan...
+	_result = [path copy];
+	[_scanner requestScan];
+}
+
+- (void) deviceBrowser:(ICDeviceBrowser*)browser didAddDevice:(ICDevice*)device moreComing:(BOOL)moreComing
+{
+	//Use the first found scanner
+	if(_scanner == nil) {
+		_scanner = [device retain];
+		[_scanner setDelegate:self];
+		[_scanner requestOpenSession];
+	}
+}
+
+- (void) deviceBrowser:(ICDeviceBrowser*)browser didRemoveDevice:(ICDevice*)device moreGoing:(BOOL)moreGoing
+{
+	;
+}
+
+- (void) willFinishRunning
+{
+	[_scanner setDelegate:nil];
+	[_scanner release];
+	_scanner = nil;
+	
+	[_browser stop];
+	[_browser setDelegate:nil];
+	[_browser release];
+	_browser = nil;
+}
+
+- (void) _abort
+{
+	if(_scanner == nil) {
+		_result = [[NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to find any connected scanner") forKey:OSAScriptErrorMessage] retain];
+		[self _didFinish];
+	}
+}
+
+/* Called on main thread */
+- (void) _performICScan
+{
+	//Look for connected scanners
+	_browser = [ICDeviceBrowser new];
+	[_browser setDelegate:self];
+	[_browser setBrowsedDeviceTypeMask:(ICDeviceLocationTypeMaskLocal | ICDeviceTypeMaskScanner)];
+	[_browser start];
+	
+	//Make sure we abort if no scanner was found within a few seconds
+	[self performSelector:@selector(_abort) withObject:nil afterDelay:2.0]; //FIXME: Is this the best method?
+}
+
+#endif
+
+/* Called on main thread */
+- (void) _performTWAINScan
+{
 	double								resolution = [[[self parameters] objectForKey:@"dpi"] doubleValue];
 	Format								format = [[[self parameters] objectForKey:@"format"] intValue];
 	Mode								mode = [[[self parameters] objectForKey:@"mode"] intValue];
@@ -173,6 +346,7 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 	double								maxSizeW = 0.0,
 										maxSizeH = 0.0;
 	NSString*							path = nil;
+	NSDictionary*						errorInfo = nil;
 	ICAGetDeviceListPB					pb1 = {};
     ICACopyObjectPropertyDictionaryPB	pb2 = {};
 	ICAScannerOpenSessionPB				pb3 = {};
@@ -299,30 +473,20 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 						pb8.sessionID = sessionID;
 						ICAScannerStatus(&pb8, NULL); //HACK: This blocks until scan is done
 						
-						if([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-							if([input isKindOfClass:[NSArray class]])
-							[output addObjectsFromArray:input];
-							else
-							[output addObject:input];
-							[output addObject:path];
-						}
-						else {
-							*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to retrieve resulting image file") forKey:OSAScriptErrorMessage];
-							path = nil;
-						}
+						if(![[NSFileManager defaultManager] fileExistsAtPath:path])
+						errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to retrieve resulting image file") forKey:OSAScriptErrorMessage];
 					}
 					else
-					*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to start scanning") forKey:OSAScriptErrorMessage];
+					errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to start scanning") forKey:OSAScriptErrorMessage];
 				}
-				else {
-					*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to set scanner parameters") forKey:OSAScriptErrorMessage];
-					path = nil;
-				}
+				else
+				errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to set scanner parameters") forKey:OSAScriptErrorMessage];
+				
 				[parameters release];
 				[scanArea release];
 			}
 			else
-			*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to get scanner parameters") forKey:OSAScriptErrorMessage];
+			errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to get scanner parameters") forKey:OSAScriptErrorMessage];
 			
 			if(pb5.theDict)
 			CFRelease(pb5.theDict);
@@ -330,17 +494,50 @@ static double _ICAP_GetPhysicalHeight(NSDictionary* info)
 			ICAScannerCloseSession(&pb4, NULL);
 		}
 		else
-		*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to connect to scanner") forKey:OSAScriptErrorMessage];
-		
-		if(path == nil)
-		return nil;
+		errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to connect to scanner") forKey:OSAScriptErrorMessage];
 	}
-	else {
-		*errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to find any connected scanner") forKey:OSAScriptErrorMessage];
-		return nil;
-	}
+	else
+	errorInfo = [NSDictionary dictionaryWithObject:LOCALIZED_STRING(@"Unable to find any connected scanner") forKey:OSAScriptErrorMessage];
 	
-	return output;
+	_result = (errorInfo ? [errorInfo retain] : [path copy]);
+	[self _didFinish];
+}
+
+- (void) _didFinish
+{
+	//Return result to Automator
+	if([_result isKindOfClass:[NSDictionary class]]) {
+		[self didFinishRunningWithError:_result];
+		[_result release];
+		_result = nil;
+	}
+	else
+	[self didFinishRunningWithError:nil];
+}
+
+- (void) runAsynchronouslyWithInput:(id)input
+{
+	[_result release];
+	_result = nil;
+	
+#ifdef IMAGE_CAPTURE_CORE_AVAILABLE
+	if(NSClassFromString(@"ICDevice"))
+	[self performSelectorOnMainThread:@selector(_performICScan) withObject:nil waitUntilDone:NO];
+	else
+#endif
+	[self performSelectorOnMainThread:@selector(_performTWAINScan) withObject:nil waitUntilDone:NO];
+}
+
+- (id) output
+{
+	return (_result ? [NSArray arrayWithObject:_result] : nil);
+}
+
+- (void) dealloc
+{
+	[_result release];
+	
+	[super dealloc];
 }
 
 @end

@@ -1,5 +1,5 @@
 /*
-	This file is part of the PolActions set of Automator actions.
+	This file is part of the PolActions collection of Automator actions.
 	Copyright (C) 2008-2009 Pierre-Olivier Latour <info@pol-online.net>
 	
 	This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Automator/Automator.h>
 
-@interface EvernoteUpload : AMBundleAction 
+@interface EvernoteUpload : AMBundleAction
 {
 	NSString*			_identifier;
 	NSDateFormatter*	_dateFormatter;
