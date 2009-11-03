@@ -80,14 +80,15 @@
 
 /* Begin PBXFileReference section */
 		089C167EFE841241C02AAC07 /* InfoPlist.strings */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = EvernoteUpload/English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		32DBCF630370AF2F00C91783 /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Prefix.pch; sourceTree = "<group>"; };
 		60E1E08B0DB55F8700B0848E /* main.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = main.xib; path = EvernoteUpload/English.lproj/main.xib; sourceTree = "<group>"; };
-		650E79E1067AB5AE00B4A4EC /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = /System/Library/Frameworks/Automator.framework; sourceTree = "<absolute>"; };
+		650E79E1067AB5AE00B4A4EC /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
 		6518174F067A8D39005BD953 /* Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
 		65181750067A8D39005BD953 /* Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Action.m; sourceTree = "<group>"; };
 		8D5B49B6048680CD000E48DA /* Create Evernote Note With File.action */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Create Evernote Note With File.action"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B478A947109F2C65005FFAF3 /* ImageCaptureCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageCaptureCore.framework; path = System/Library/Frameworks/ImageCaptureCore.framework; sourceTree = SDKROOT; };
 		E209ABC6109E63C700AE58EC /* build.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
 		E209ABC7109E63C700AE58EC /* googlecode_upload.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = googlecode_upload.py; sourceTree = "<group>"; };
 		E2939685109910A100BA5DB6 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -213,6 +214,7 @@
 				E2939685109910A100BA5DB6 /* IOKit.framework */,
 				E293968A109910A900BA5DB6 /* SystemConfiguration.framework */,
 				E2C338EB1099080400BE3C1A /* Security.framework */,
+				B478A947109F2C65005FFAF3 /* ImageCaptureCore.framework */,
 			);
 			name = "Frameworks and Libraries";
 			sourceTree = "<group>";
@@ -640,12 +642,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2C33898109906FE00BE3C1A /* Debug.xcconfig */;
 			buildSettings = {
-				"ARCHS[sdk=macosx10.5*]" = "$(ARCHS_STANDARD_32_64_BIT)";
 				"ARCHS[sdk=macosx10.6*]" = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "${SDKROOT}/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks";
 				GCC_ENABLE_OBJC_GC = supported;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/thrift-cocoa/src/**";
-				SDKROOT = macosx10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -653,12 +655,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2C33899109906FE00BE3C1A /* Release.xcconfig */;
 			buildSettings = {
-				"ARCHS[sdk=macosx10.5*]" = "$(ARCHS_STANDARD_32_64_BIT)";
 				"ARCHS[sdk=macosx10.6*]" = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "${SDKROOT}/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks";
 				GCC_ENABLE_OBJC_GC = supported;
+				"GCC_TREAT_WARNINGS_AS_ERRORS[sdk=macosx10.6][arch=*]" = NO;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/thrift-cocoa/src/**";
-				SDKROOT = macosx10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
@@ -667,6 +670,10 @@
 			buildSettings = {
 				INFOPLIST_FILE = ScanDocument/Info.plist;
 				INSTALL_PATH = /;
+				"OTHER_LDFLAGS[sdk=macosx10.6][arch=*]" = (
+					"-weak_framework",
+					ImageCaptureCore,
+				);
 				PRODUCT_NAME = "Scan Document";
 				SKIP_INSTALL = NO;
 				WRAPPER_EXTENSION = action;
@@ -678,6 +685,10 @@
 			buildSettings = {
 				INFOPLIST_FILE = ScanDocument/Info.plist;
 				INSTALL_PATH = /;
+				"OTHER_LDFLAGS[sdk=macosx10.6][arch=*]" = (
+					"-weak_framework",
+					ImageCaptureCore,
+				);
 				PRODUCT_NAME = "Scan Document";
 				SKIP_INSTALL = NO;
 				WRAPPER_EXTENSION = action;

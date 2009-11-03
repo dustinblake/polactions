@@ -1,5 +1,5 @@
 /*
-	This file is part of the PolActions set of Automator actions.
+	This file is part of the PolActions collection of Automator actions.
 	Copyright (C) 2008-2009 Pierre-Olivier Latour <info@pol-online.net>
 	
 	This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,25 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#import <AvailabilityMacros.h>
+
+#if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MAX_REQUIRED <= MAC_OS_X_VERSION_10_6)
+#define IMAGE_CAPTURE_CORE_AVAILABLE 1
+#endif
+
 #import <Cocoa/Cocoa.h>
 #import <Automator/Automator.h>
+#ifdef IMAGE_CAPTURE_CORE_AVAILABLE
+#import <ImageCaptureCore/ImageCaptureCore.h>
+#endif
 
-@interface ScanDocument : AMBundleAction 
+@interface ScanDocument : AMBundleAction
+{
+@private
+	id							_result;
+#ifdef IMAGE_CAPTURE_CORE_AVAILABLE
+	ICDeviceBrowser*			_browser;
+	ICScannerDevice*			_scanner;
+#endif
+}
 @end
